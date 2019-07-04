@@ -1,6 +1,6 @@
 export const ADD_CART = 'cart:addProduct';
 
-export function updateCart (productObject) {
+export function addCart (productObject) {
   return {
     type: ADD_CART,
     payload: productObject

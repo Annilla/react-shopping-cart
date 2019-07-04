@@ -1,35 +1,45 @@
 import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
-import { updateCart } from './actions/cart-actions';
+import { addCart } from './actions/cart-actions';
+import { createSelector } from 'reselect';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.onUpdateCart = this.onUpdateCart.bind(this);
   }
 
-  onUpdateCart(p, qty) {
-    let product = { ...p, qty }
-    this.props.onUpdateCart(product);
+  componentDidMount() {
+    console.log(this.props.products);
   }
 
   handleSelectChange(p, event) {
-    p.qty = event.target.value;
+    this.props.products.forEach(el => {
+      if(el.id === p.id) { el.qty = Number(event.target.value); }
+    });
+    console.log(this.props.products);
+  }
+
+  buyItem(id) {
+    let item = this.props.products.find(el => el.id === id);
+    this.props.onAddCart(item);
   }
 
   render() {
     let products = this.props.products.map((p) =>
       <li key={p.id}>
         [{p.id}] {p.name}: ${p.price}
-        <select onChange={this.handleSelectChange.bind(this, p)}>
+        <select
+          onChange={this.handleSelectChange.bind(this, p)}>
           <option value={1}>1</option>
           <option value={2}>2</option>
           <option value={3}>3</option>
           <option value={4}>4</option>
           <option value={5}>5</option>
         </select>
-        <button onClick={this.onUpdateCart(p, p.qty ? p.qty : 1)}>Buy</button>
+        <button onClick={() => {this.buyItem(p.id)}}>
+          Buy
+        </button>
       </li>
     );
 
@@ -37,20 +47,27 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <ul>{products}</ul>
-          <div>Cart Total: {this.props.cart.length}</div>
+          <div>Cart Total: {subtotalSelector(this.props)}</div>
         </header>
       </div>
     );
   }
 }
 
+const cartItemsSelector = state => state.cart;
+
+const subtotalSelector = createSelector(
+  cartItemsSelector,
+  items => items.reduce((acc, item) => acc + item.qty, 0)
+)
+
 const mapStateToProps = state => ({
-  products: state.products,
+  products: state.products.map(el => ({ ...el, qty: 1 })),
   cart: state.cart
 });
 
 const mapActionsToProps = {
-  onUpdateCart: updateCart
+  onAddCart: addCart
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(App);

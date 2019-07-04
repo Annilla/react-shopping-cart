@@ -6,7 +6,7 @@ export default function cartReducer(state = [], {type, payload}) {
       // 檢查 cart 裡面有沒有重複的產品
       let checkItem = state.filter(el => el.id === payload.id);
 
-      if (checkItem.length) {
+      if (!checkItem.length) {
         // 沒有重複就直接加入
         return [ ...state, payload ];
       } else {
