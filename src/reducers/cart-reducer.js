@@ -13,13 +13,10 @@ export default function cartReducer(state = [], {type, payload}) {
         // 有重複就將數量相加
         return state.map(el => {
           if (el.id === checkItem[0].id) {
-            return {
-              id: el.id,
-              name: el.name,
-              price: el.price,
-              qty: el.qty + payload.qty
-            }
-          } else { return el; }
+            return { ...el, qty: el.qty + payload.qty };
+          } else {
+            return el;
+          }
         });
       }
     default:
